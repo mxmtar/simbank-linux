@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# mkdist
+# usage: mkdist [tag]
+
+if [ "${1}" ]; then
+	TAG=${1}
+	VERSION=${1}
+else
+	TAG=HEAD
+	HASH=`git log -1 --pretty=%h`
+	if [ -f .version ]; then
+		VERSION=`cat .version`-${HASH}
+	else
+		VERSION=unknown-${HASH}
+	fi
+fi
+
+./mkverhdr SIMBANK_LINUX ${VERSION} > simbank/version.h
+
+rm -f simbank-linux-${VERSION}.tar.gz
+rm -rf simbank-linux-${VERSION}
+
+git archive --format=tar.gz --prefix=simbank-linux-${VERSION}/ ${TAG} > simbank-linux-${VERSION}.tar.gz
+
+tar -xzf simbank-linux-${VERSION}.tar.gz
+cp simbank/version.h simbank-linux-${VERSION}/simbank/version.h
+tar -czf simbank-linux-${VERSION}.tar.gz simbank-linux-${VERSION}
+
+rm -rf simbank-linux-${VERSION}
+
+# end of mkdist

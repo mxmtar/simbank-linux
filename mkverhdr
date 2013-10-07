@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# mkverhdr
+# usage: mkverhdr prefix [version]
+
+if [ -n "${1}" ]; then
+
+	if [ "${2}" ]; then
+		VERSION=${2}
+	else
+		VERSION=unknown
+	fi
+
+	printf "/******************************************************************************/\n"
+	printf "/* version.h                                                                  */\n"
+	printf "/******************************************************************************/\n"
+	printf "/* this file is automaticaly generated                                        */\n"
+	printf "/******************************************************************************/\n"
+	printf "\n"
+	printf "#ifndef __${1}_VERSION_H__\n"
+	printf "#define __${1}_VERSION_H__\n"
+	printf "\n"
+	printf "#define ${1}_VERSION \"%s\"\n" ${VERSION}
+	printf "\n"
+	printf "#endif //__${1}_VERSION_H__\n"
+	printf "\n"
+	printf "/******************************************************************************/\n"
+	printf "/* end of version.h                                                           */\n"
+	printf "/******************************************************************************/\n"
+
+else
+	echo "usage: mkverhdr prefix [version]"
+fi
+
+# end of mkverhdr
