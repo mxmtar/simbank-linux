@@ -24,6 +24,9 @@ rm -rf simbank-linux-${VERSION}
 git archive --format=tar.gz --prefix=simbank-linux-${VERSION}/ ${TAG} > simbank-linux-${VERSION}.tar.gz
 
 tar -xzf simbank-linux-${VERSION}.tar.gz
+rm -f simbank-linux-${VERSION}/simbank/.gitignore
+rm -f simbank-linux-${VERSION}/.gitignore
+rm -f simbank-linux-${VERSION}/.version
 cp simbank/version.h simbank-linux-${VERSION}/simbank/version.h
 tar -czf simbank-linux-${VERSION}.tar.gz simbank-linux-${VERSION}
 
