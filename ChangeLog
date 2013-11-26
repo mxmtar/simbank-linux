@@ -1,2 +1,6 @@
+2013-11-26
+	1. Change version to 0.2
+	2. Apply changes according to SBG4 hardware. Reset hardware buffer poniters
+before writing data to SIM-card.
 2013-10-10
 	1. Improved install/uninstall Makefile target.

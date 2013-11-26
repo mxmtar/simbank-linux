@@ -27,6 +27,8 @@ tar -xzf simbank-linux-${VERSION}.tar.gz
 rm -f simbank-linux-${VERSION}/simbank/.gitignore
 rm -f simbank-linux-${VERSION}/.gitignore
 rm -f simbank-linux-${VERSION}/.version
+rm -f simbank-linux-${VERSION}/mkdist
+rm -f simbank-linux-${VERSION}/mkverhdr
 cp simbank/version.h simbank-linux-${VERSION}/simbank/version.h
 tar -czf simbank-linux-${VERSION}.tar.gz simbank-linux-${VERSION}
 
