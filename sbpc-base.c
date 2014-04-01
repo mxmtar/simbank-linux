@@ -381,6 +381,11 @@ static void sbpc_poll_proc(unsigned long data)
 										sim->write_tail = 0;
 									}
 									sim->write_count -= chunk;
+#ifdef SIM_MONITOR
+									if ((sim_mon > -1) && (sim_mon == i)) {
+										verbose("%03lu: tx_buf: wr=%02x rp=%02x fl=%u\n", (unsigned long int)i, tx_buf_regs.wp, tx_buf_regs.rp, tx_buf_regs.fl);
+									}
+#endif
 								} else if ((tx_buf_regs.wp > tx_buf_regs.rp) || (tx_buf_regs.fl == 0)) {
 #ifdef SIM_MONITOR
 									if ((sim_mon > -1) && (sim_mon == i)) {
@@ -418,6 +423,11 @@ static void sbpc_poll_proc(unsigned long data)
 										sim->write_tail = 0;
 									}
 									sim->write_count -= chunk;
+#ifdef SIM_MONITOR
+									if ((sim_mon > -1) && (sim_mon == i)) {
+										verbose("%03lu: tx_buf: wr=%02x rp=%02x fl=%u\n", (unsigned long int)i, tx_buf_regs.wp, tx_buf_regs.rp, tx_buf_regs.fl);
+									}
+#endif
 								} else {
 									break;
 								}
@@ -461,6 +471,11 @@ static void sbpc_poll_proc(unsigned long data)
 										sim->write_tail = 0;
 									}
 									sim->write_count -= chunk;
+#ifdef SIM_MONITOR
+									if ((sim_mon > -1) && (sim_mon == i)) {
+										verbose("%03lu: tx_buf: wr=%02x rp=%02x fl=%u\n", (unsigned long int)i, tx_buf_regs.wp, tx_buf_regs.rp, tx_buf_regs.fl);
+									}
+#endif
 								} else if ((tx_buf_regs.wp > tx_buf_regs.rp) || (tx_buf_regs.fl == 0)) {
 #ifdef SIM_MONITOR
 									if ((sim_mon > -1) && (sim_mon == i)) {
@@ -498,6 +513,11 @@ static void sbpc_poll_proc(unsigned long data)
 										sim->write_tail = 0;
 									}
 									sim->write_count -= chunk;
+#ifdef SIM_MONITOR
+									if ((sim_mon > -1) && (sim_mon == i)) {
+										verbose("%03lu: tx_buf: wr=%02x rp=%02x fl=%u\n", (unsigned long int)i, tx_buf_regs.wp, tx_buf_regs.rp, tx_buf_regs.fl);
+									}
+#endif
 								} else {
 									break;
 								}
@@ -1006,6 +1026,11 @@ static int __init sbpc_init(void)
 
 	verbose("loading version \"%s\"...\n", SIMBANK_LINUX_VERSION);
 
+	if (HZ < 1000) {
+		log(KERN_ERR, "HZ=%d to low, set to >=1000\n", HZ);
+		goto sbpc_init_error;
+	}
+
 	if ((sim_start < 0) || (sim_start >= SBPC_BOARD_SIM_MAXCOUNT)) {
 		sim_start = 0;
 	}
@@ -1055,6 +1080,7 @@ sbpc_init_error:
 	if (sbpc_class) {
 		class_destroy(sbpc_class);
 	}
+	verbose("loading failed\n");
 	return rc;
 }
 
