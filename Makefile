@@ -5,9 +5,9 @@ INSTALL := install
 
 KERNEL_MOD_DIR := polygator
 
-obj-m := simbank.o
-
 ifeq ($(TARGET_DEVICE), sbg4)
+
+obj-m := simbank.o
 
 simbank-objs := sbg4-base.o
 
@@ -16,7 +16,10 @@ KERNEL_STG_DIR := $(INSTALL_MOD_PATH)
 
 else
 
+obj-m := simbank.o sbpca.o
+
 simbank-objs := sbpc-base.o
+sbpca-objs := sbpca-base.o
 
 KERNEL_VERSION := `uname -r`
 KERNEL_SRC_DIR := /lib/modules/$(KERNEL_VERSION)/build
@@ -49,6 +52,7 @@ install_modules:
 	rm -fv "$(DESTDIR)/lib/modules/$(KERNEL_VERSION)/$(KERNEL_MOD_DIR)/sbpc.ko"
 	rm -fv "$(DESTDIR)/lib/modules/$(KERNEL_VERSION)/$(KERNEL_MOD_DIR)/sbg4.ko"
 	rm -fv "$(DESTDIR)/lib/modules/$(KERNEL_VERSION)/$(KERNEL_MOD_DIR)/simbank.ko"
+	rm -fv "$(DESTDIR)/lib/modules/$(KERNEL_VERSION)/$(KERNEL_MOD_DIR)/sbpca.ko"
 	@make -C $(KERNEL_SRC_DIR) M=$(PWD) INSTALL_MOD_PATH=$(KERNEL_STG_DIR) INSTALL_MOD_DIR=$(KERNEL_MOD_DIR) modules_install
 
 install_headers:
@@ -70,6 +74,7 @@ uninstall_modules:
 	rm -fv "$(DESTDIR)/lib/modules/$(KERNEL_VERSION)/$(KERNEL_MOD_DIR)/sbpc.ko"
 	rm -fv "$(DESTDIR)/lib/modules/$(KERNEL_VERSION)/$(KERNEL_MOD_DIR)/sbg4.ko"
 	rm -fv "$(DESTDIR)/lib/modules/$(KERNEL_VERSION)/$(KERNEL_MOD_DIR)/simbank.ko"
+	rm -fv "$(DESTDIR)/lib/modules/$(KERNEL_VERSION)/$(KERNEL_MOD_DIR)/sbpca.ko"
 	depmod
 
 uninstall_headers:
