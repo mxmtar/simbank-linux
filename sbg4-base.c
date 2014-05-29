@@ -17,12 +17,34 @@
 
 #include "../arch/arm/include/asm/io.h"
 #include "../arch/arm/mach-at91/include/mach/hardware.h"
-#include "../arch/arm/mach-at91/include/mach/io.h"
+// #include "../arch/arm/mach-at91/include/mach/io.h"
 #include "../arch/arm/mach-at91/include/mach/at91_pio.h"
 #include "../arch/arm/mach-at91/include/mach/at91sam9260_matrix.h"
 
 #include "simbank/simcard-def.h"
 #include "simbank/version.h"
+
+#ifndef __ASSEMBLY__
+static inline unsigned int at91_sys_read(unsigned int reg_offset)
+{
+	void __iomem *addr = (void __iomem *)AT91_VA_BASE_SYS;
+
+	return __raw_readl(addr + reg_offset);
+}
+static inline void at91_sys_write(unsigned int reg_offset, unsigned long value)
+{
+	void __iomem *addr = (void __iomem *)AT91_VA_BASE_SYS;
+
+	__raw_writel(value, addr + reg_offset);
+}
+#endif
+#ifndef AT91_PIOC
+#define AT91_PIOC	(AT91SAM9260_BASE_PIOC - AT91_BASE_SYS)
+#endif
+#ifndef AT91_SMC0
+#undef AT91_SMC
+#define AT91_SMC	(AT91SAM9260_BASE_SMC - AT91_BASE_SYS)
+#endif
 
 MODULE_AUTHOR("Maksym Tarasevych <mxmtar@gmail.com>");
 MODULE_DESCRIPTION("Polygator Linux module for SBG4 device");

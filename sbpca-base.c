@@ -182,7 +182,7 @@ static void sbpca_poll_proc(unsigned long data)
 					} else if (sim->rx_buf_wp > sim->rx_buf_rp) {
 						while (sim->rx_buf_wp > sim->rx_buf_rp) {
 							if (sim->read_head < sim->read_tail) {
-								chunk = min((size_t)(sim->read_tail - sim->read_head), (size_t)(sim->rx_buf_wp > sim->rx_buf_rp));
+								chunk = min((size_t)(sim->read_tail - sim->read_head), (size_t)(sim->rx_buf_wp - sim->rx_buf_rp));
 								memcpy_fromio(&sim->read_buf[sim->read_head], mem + num * 0x200 + sim->rx_buf_rp, chunk);
 								// update device pointers
 								sim->rx_buf_rp += chunk;
@@ -193,7 +193,7 @@ static void sbpca_poll_proc(unsigned long data)
 								}
 								sim->read_count += chunk;
 							} else if ((sim->read_head > sim->read_tail) || (sim->read_count == 0)) {
-								chunk = min((size_t)(SBPCA_SIM_DATA_BUFF_SIZE - sim->read_head), (size_t)(sim->rx_buf_wp > sim->rx_buf_rp));
+								chunk = min((size_t)(SBPCA_SIM_DATA_BUFF_SIZE - sim->read_head), (size_t)(sim->rx_buf_wp - sim->rx_buf_rp));
 								memcpy_fromio(&sim->read_buf[sim->read_head], mem + num * 0x200 + sim->rx_buf_rp, chunk);
 								// update device pointers
 								sim->rx_buf_rp += chunk;
