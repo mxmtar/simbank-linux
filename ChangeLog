@@ -1,2 +1,4 @@
+2014-06-19
+	1. Stage received data before read in sbpca module.
 2014-05-29
-	1. Added support sbg4 module with kernel 3.12.11.
+	1. Added support sbg4 module with kernel 3.12.11. (ARM)

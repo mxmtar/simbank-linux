@@ -36,6 +36,10 @@ static int sim_end = 199;
 module_param(sim_end, int, 0);
 MODULE_PARM_DESC(sim_end, "End SIM Number");
 
+static int stage_time = 50;
+module_param(stage_time, int, 0);
+MODULE_PARM_DESC(stage_time, "Read Data Stage Time (ms)");
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
 	#define CLASS_DEV_CREATE(_class, _devt, _device, _name) device_create(_class, _device, _devt, NULL, "%s", _name)
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,26)
@@ -77,6 +81,8 @@ MODULE_PARM_DESC(sim_end, "End SIM Number");
 
 #define SBPCA_SIM_CTRL_BASE			0xfc00
 #define SBPCA_SIM_FLAG_BASE			0xfe00
+
+static size_t stage_time_cast = 1;
 
 union simcard_control_register {
 	struct {
@@ -122,6 +128,8 @@ struct sbpca_simcard_device {
 	size_t write_count;
 	size_t write_overflow;
 
+	size_t rx_buf_wp_count;
+	size_t rx_buf_wp_stage;
 	size_t rx_buf_wp;
 	size_t rx_buf_rp;
 
@@ -175,7 +183,18 @@ static void sbpca_poll_proc(unsigned long data)
 			}
 			spin_lock(&sim->lock);
 			if (sim->control_register->bits.reset) {
-				sim->rx_buf_wp = flag_register->bits.rx_wp;
+				if (flag_register->bits.rx_wp) {
+					if (sim->rx_buf_wp_stage == flag_register->bits.rx_wp) {
+						sim->rx_buf_wp_count--;
+					} else {
+						sim->rx_buf_wp_count = stage_time_cast;
+						sim->rx_buf_wp_stage = flag_register->bits.rx_wp;
+					}
+					if (!sim->rx_buf_wp_count) {
+						sim->rx_buf_wp = flag_register->bits.rx_wp;
+						sim->rx_buf_wp_count = stage_time_cast;
+					}
+				}
 				while (1) {
 					if (sim->read_count == SBPCA_SIM_DATA_BUFF_SIZE) {
 						break;
@@ -339,7 +358,6 @@ static ssize_t sbpca_simcard_write(struct file *filp, const char __user *buff, s
 	size_t num;
 	ssize_t res;
 	size_t length;
-// 	size_t rest, pos, chunk;
 	struct simcard_data data;
 
 	struct sbpca_simcard_device *sim = filp->private_data;
@@ -365,6 +383,8 @@ static ssize_t sbpca_simcard_write(struct file *filp, const char __user *buff, s
 	switch (data.header.type) {
 		case SIMCARD_CONTAINER_TYPE_DATA:
 			memcpy_toio(mem + num * 0x200, data.container.data, data.header.length);
+			sim->rx_buf_wp_count = stage_time_cast;
+			sim->rx_buf_wp_stage = 0;
 			sim->rx_buf_wp = 0;
 			sim->rx_buf_rp = 0;
 			break;
@@ -623,9 +643,11 @@ static int __init sbpca_init(void)
 
 	verbose("loading version \"%s\"...\n", SIMBANK_LINUX_VERSION);
 
-	if (HZ < 1000) {
-		log(KERN_ERR, "HZ=%d to low, set to >=1000\n", HZ);
-		goto sbpca_init_error;
+	if (stage_time > 0) {
+		stage_time_cast = stage_time * (HZ / 1000);
+	}
+	if (stage_time_cast == 0) {
+		stage_time_cast = 1;
 	}
 
 	if ((sim_start < 0) || (sim_start >= SBPCA_BOARD_SIM_MAXCOUNT)) {
