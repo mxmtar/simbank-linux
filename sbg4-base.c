@@ -686,6 +686,8 @@ static ssize_t sbg4_simcard_write(struct file *filp, const char __user *buff, si
 		case SIMCARD_CONTAINER_TYPE_MONITOR:
 			iowrite8(data.container.monitor, sbg4_cs3_base_ptr + SBG4_BOARD_CTRL_BASE + (sim->board->position << 18) + (0 << 17) + SBG4_BOARD_CTRL_MONITOR);
 			break;
+		case SIMCARD_CONTAINER_TYPE_LED:
+			break;
 		default:
 			spin_unlock_bh(&sim->lock);
 			res = -EINVAL;

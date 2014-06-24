@@ -1,3 +1,5 @@
+2014-06-24
+	1. Add empty LED operation for compatibility in sbg4 module.
 2014-06-19
 	1. Stage received data before read in sbpca module.
 2014-05-29
